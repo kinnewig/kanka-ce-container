@@ -17,6 +17,8 @@ If you want simply want to run Kanka, take a look at [Kanka CE](https://github.c
 ## Contributing
 
 Kanka Community Edition and Kanka CE Tools can only exist if the community helps build it.
+To get started, you can read the [contributing guide](https://github.com/kinnewig/kanka-ce-tools/blob/main/CONTRIBUTING.md) 
+or take a look at the [ToDo List](https://github.com/kinnewig/kanka-community-edition/blob/develop-ce/TODO.md).
 
 This project is entirely maintained by volunteers, people who love Kanka, want to self‑host it, and believe in open collaboration. Every improvement, every fix, every idea comes from people like you. Kanka CE is still in an early stage, so help is apprichiated very much!
 
