@@ -1,0 +1,78 @@
+name: Auto Update Kanka CE
+
+on:
+  schedule:
+    - cron: "0 4 * * 0"  # Every Sunday at 04:00 UTC
+  workflow_dispatch:
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Kanka CE repo
+        uses: actions/checkout@v4
+        with:
+          ref: develop-ce
+          fetch-depth: 0
+
+      - name: Add Kanka upstream as remote
+        run: |
+          git remote add upstream https://github.com/owlchester/kanka.git
+          git fetch upstream --tags
+
+      - name: Determine latest Kanka release
+        id: latest
+        run: |
+          TAG=$(git tag -l --sort=-v:refname | head -n 1)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Determine current Kanka CE version
+        id: current
+        run: |
+          if [ -f VERSION ]; then
+            VERSION=$(cat VERSION)
+          else
+            echo "ERROR: VERSION file missing"
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if update is needed
+        run: |
+          if [ "${{ steps.latest.outputs.tag }}" = "${{ steps.current.outputs.version }}" ]; then
+            echo "No new upstream release. Exiting."
+            exit 1
+          fi
+
+      - name: Create autoupdate branch
+        run: |
+          git checkout -B autoupdate
+
+      - name: Merge latest upstream release
+        run: |
+          git merge --no-edit ${{ steps.latest.outputs.tag }} || true
+
+      - name: Configure Git identity
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+
+      - name: Update VERSION file
+        run: |
+          echo "${{ steps.latest.outputs.tag }}" > VERSION
+          git add VERSION
+          git commit -m "Update VERSION to ${{ steps.latest.outputs.tag }}" || true
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: autoupdate
+          base: develop-ce
+          title: "Auto Update: Upstream ${{ steps.latest.outputs.tag }}"
+          body: |
+            This PR was automatically generated.
+
+            - Upstream release: **${{ steps.latest.outputs.tag }}**
+

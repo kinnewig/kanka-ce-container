@@ -28,6 +28,7 @@ source "$TOOLS_ROOT/core/lib.sh"
 
 # -- Folder that are not required by the CE version ---
 rm -rf $KANKA_ROOT_DIR/.claude
+rm -rf $KANKA_ROOT_DIR/.github                    # We replace the workflows with our own
 rm -rf $KANKA_ROOT_DIR/.mariadb
 rm -rf $KANKA_ROOT_DIR/docker
 rm -rf $KANKA_ROOT_DIR/docs                       # We want to provide different documents than the upstream.
@@ -35,5 +36,5 @@ rm -rf $KANKA_ROOT_DIR/public/vendor/fontawesome  # The included fontawesome ver
 
 # --- Files that are not required by the CE version ---
 rm -f $KANKA_ROOT_DIR/.env.testing
-
+rm -f $KANKA_ROOT_DIR/CLAUDE.md
 

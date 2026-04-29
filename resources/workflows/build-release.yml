@@ -1,0 +1,103 @@
+name: Build Kanka CE Release
+
+on:
+  schedule:
+    - cron: "0 5 * * 0"  # Every Sunday at 05:00 UTC
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Kanka CE repo
+        uses: actions/checkout@v4
+        with:
+          ref: develop-ce
+          fetch-depth: 0
+
+      - name: Read upstream version from CE VERSION file
+        id: upstream
+        run: |
+          if [ -f VERSION ]; then
+            VERSION=$(cat VERSION)
+          else
+            echo "ERROR: VERSION file missing"
+            exit 1
+          fi
+          echo "kanka=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Download kanka-ce-tools and read version
+        id: tools
+        run: |
+          git clone --depth=1 https://github.com/kinnewig/kanka-ce-tools.git /tmp/kanka-ce-tools
+          if [ -f /tmp/kanka-ce-tools/VERSION ]; then
+            CE_VERSION=$(cat /tmp/kanka-ce-tools/VERSION)
+          else
+            echo "ERROR: Kanka CE Tools VERSION file missing"
+            exit 1
+          fi
+
+          echo "cetools=$CE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Compute combined CE version
+        id: combined
+        run: |
+          COMBINED="${{ steps.upstream.outputs.kanka }}-${{ steps.tools.outputs.cetools }}"
+          echo "combined=$COMBINED" >> $GITHUB_OUTPUT
+
+      - name: Fetch latest branch
+        run: |
+          git fetch origin latest || true
+
+      - name: Check if latest already contains this version
+        id: check
+        run: |
+          if git show-ref --verify --quiet refs/remotes/origin/latest; then
+            git checkout -b latest origin/latest
+            if [ -f VERSION ]; then
+              BUILT=$(cat VERSION)
+              if [ "$BUILT" = "${{ steps.combined.outputs.combined }}" ]; then
+                echo "Release $BUILT already exists in latest. Exiting."
+                exit 1
+              fi
+            fi
+          fi
+
+      - name: Backup existing latest branch
+        run: |
+          git fetch origin latest || true
+          if git show-ref --verify --quiet refs/remotes/origin/latest; then
+            git checkout -b latest-backup-${{ steps.combined.outputs.combined }} origin/latest
+            git push origin latest-backup-${{ steps.combined.outputs.combined }}
+          fi
+
+      - name: Create fresh latest branch
+        run: |
+          git checkout develop-ce
+          git checkout -B latest
+
+      - name: Apply Kanka CE Tools
+        run: |
+          cd /tmp/kanka-ce-tools
+          ./kanka-ce-build --kanka-dir "$GITHUB_WORKSPACE"
+
+      - name: Write combined version into VERSION
+        run: |
+          echo "${{ steps.combined.outputs.combined }}" > VERSION
+          git add VERSION
+
+      - name: Configure Git identity
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+
+      - name: Commit changes
+        run: |
+          git add -A
+          git commit -m "Build CE release ${{ steps.combined.outputs.combined }}" || true
+
+      - name: Force push latest
+        run: |
+          git push origin latest --force
+
