@@ -29,6 +29,7 @@ services:
             - minio
             - meilisearch
             - mailpit
+            - fail2ban
 #            - reverb
     mariadb:
         container_name: kanka_ce_mariadb
@@ -156,6 +157,20 @@ services:
             test: ["CMD", "wget", "--no-verbose", "--spider",  "http://127.0.0.1:7700/health"]
             retries: 3
             timeout: 5s
+    fail2ban:
+        container_name: kanka_ce_fail2ban
+        image: 'linuxserver/fail2ban:latest'
+        cap_add:
+            - NET_ADMIN
+            - NET_RAW
+        network_mode: host
+        environment:
+            - 'PUID=${APP_USER_ID}'
+            - 'PGID=${APP_USER_ID}'
+        volumes:
+          - ./.fail2ban:/config
+          - ./storage/logs:/var/log/kanka:ro
+#          -v /var/log:/var/log:ro # <- this line enables fail2ban for ssh aswell.
 #    reverb:
 #        container_name: kanka_ce_reverb
 #        build:
