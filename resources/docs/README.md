@@ -15,7 +15,12 @@ Kanka CE is **not** affiliated with the official Kanka project.
 
 ## Quick Start Guide
 
+For a detailed installation guide see the [Wiki page](https://github.com/kinnewig/kanka-community-edition/wiki/Installation)
+
+But it basically boils down to:
+
 - Install prequisits
+Install `docker` and `docker-compose` or alternatively install `podman` and `podman compose`.
 
 - Download Kanka CE
 ```bash
@@ -37,7 +42,7 @@ To generate secure passwords run
 
 - In case you are running rootfull
 ```bash
-chown -R 1000:1000 </PATH/TO/KANKA-CE/ROOT>
+chown -R 1000:1000 </PATH/TO/kanka-community-edition>
 ```
 
 - Prepare the container
@@ -45,6 +50,7 @@ This is fully automated, just run the following command
 ```bash
 ./prepare-kanka-ce.sh
 ```
+If you do want to this manually you can follow the instaltion guide on the [manual install](https://github.com/kinnewig/kanka-community-edition/wiki/Installation#option-2-manual)
 
 - Preview
 You should now be able to preview Kanka-CE when you visit
@@ -53,6 +59,8 @@ http://localhost:8081
 ```
 However, you should **not** publish that port to the internet. 
 Instead you should configure a reverse proxy pointing to that port.
+
+To login, you need to register a new account.
 
 - Publish 
 Once you are satisfied with your configuration and ensured everything is safe, you are ready to publish your very own Kanka-CE!
@@ -64,11 +72,13 @@ to
 ```bash
 APP_ENV=production
 ```
-
+You should consider restricting the registration, by either disable it completely, or allow registration only with an invitation password (which can be set in the `.env`).
 
 ## Contributing
 
 Kanka Community Edition can only exist if the community helps build it.
+To get started, you can read the [contributing guide](https://github.com/kinnewig/kanka-community-edition/blob/develop-ce/CONTRIBUTING.md)
+or take a look at the [ToDo List](https://github.com/kinnewig/kanka-community-edition/blob/develop-ce/TODO.md).
 
 This project is entirely maintained by volunteers, people who love Kanka, want to self‑host it, and believe in open collaboration. Every improvement, every fix, every idea comes from people like you. Kanka CE is still in an early stage, so help is apprichiated very much!
 
