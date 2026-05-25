@@ -146,10 +146,20 @@ first_set_up() {
   sleep 10
   # check if mariadb is ready
   MARIADB_CONTAINER=$(sail ps --format "{{.Names}}" | grep mariadb)
-  until podman exec $MARIADB_CONTAINER mariadb -u root -p${DB_ROOT_PASSWORD} ${DB_DATABASE} -h "localhost" --silent; do
-    echo "Waiting for MariaDB to be ready..."
-    sleep 2
-  done
+  if [ "$provider" = "podman" ]; then
+    until podman exec $MARIADB_CONTAINER mariadb -u root -p${DB_ROOT_PASSWORD} ${DB_DATABASE} -h "localhost" --silent; do
+      echo "Waiting for MariaDB to be ready..."
+      sleep 2
+    done
+  elif [ "$provider" = "docker" ]; then
+    until docker exec "$MARIADB_CONTAINER" mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_DATABASE}" -h "localhost" --silent; do
+      echo "Waiting for MariaDB to be ready..."
+      sleep 2
+    done
+  else
+    cecho ${ERROR} "Error: Neither 'podman' nor 'docker' is available on this system."
+    exit 1
+  fi
   echo "MariaDB ready to use!"
 
 
