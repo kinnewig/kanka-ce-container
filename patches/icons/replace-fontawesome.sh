@@ -67,8 +67,8 @@ LINE_AWESOME_VERSION="1.3.0"
 
 FONTAWSOME_BLADE_FILE="${KANKA_ROOT_DIR}/resources/views/layouts/styles/fontawesome.blade.php"
 
-TRANSLATION_TABLE_LINEAWESOME="patches/icons/translationtable_fontawesome-nonfree-to-lineawesome.sh"
-TRANSLATION_TABLE_FONTAWESOME_FREE="patches/icons/translationtable_fontawesome-nonfree-to-fontawesome-free.sh"
+TRANSLATION_TABLE_LINEAWESOME="${TOOLS_ROOT}/patches/icons/translationtable_fontawesome-nonfree-to-lineawesome.sh"
+TRANSLATION_TABLE_FONTAWESOME_FREE="${TOOLS_ROOT}/patches/icons/translationtable_fontawesome-nonfree-to-fontawesome-free.sh"
 
 verbose=false
 
