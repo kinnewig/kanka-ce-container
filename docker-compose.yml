@@ -1,7 +1,7 @@
 services:
     kanka:
         container_name: kanka_ce
-        image: 'kanka-ce:latest'
+        image: 'ghcr.io/kinnewig/kanka-ce:latest'
         ports:
             - '${APP_PORT:-80}:80'
         volumes:
